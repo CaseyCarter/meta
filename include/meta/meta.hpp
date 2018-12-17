@@ -470,7 +470,7 @@ namespace meta
         /// \cond
         namespace detail
         {
-            template <class T, T N>
+            template <typename T, T N>
             __make_integer_seq<integer_sequence, T, N> make_integer_sequence_();
         }
         /// \endcond
@@ -504,7 +504,7 @@ namespace meta
         /// \par Complexity
         /// \f$ O(log(To - From)) \f$.
         /// \ingroup integral
-        template <class T, T From, T To>
+        template <typename T, T From, T To>
         using integer_range =
             _t<detail::coerce_indices_<T, From,
                                        make_index_sequence<detail::range_distance_(From, To)>>>;
@@ -645,18 +645,18 @@ namespace meta
             };
 
 #ifdef META_WORKAROUND_MSVC_703656
-            template <typename, template <class...> class, typename...>
+            template <typename, template <typename...> class, typename...>
             struct _defer_
             {
             };
 
-            template <template <class...> class C, typename... Ts>
+            template <template <typename...> class C, typename... Ts>
             struct _defer_<void_<C<Ts...>>, C, Ts...>
             {
                 using type = C<Ts...>;
             };
 
-            template <template <class...> class C, typename... Ts>
+            template <template <typename...> class C, typename... Ts>
             using defer_ = _defer_<void, C, Ts...>;
 
             template <typename, typename T, template <T...> class, T...>
@@ -768,7 +768,7 @@ namespace meta
         /// \par Complexity
         /// \f$ O(1) \f$.
         /// \ingroup trait
-        template <class T>
+        template <typename T>
         using sizeof_ = meta::size_t<sizeof(T)>;
 
         /// An alias that computes the alignment required for any instance of the type
@@ -776,7 +776,7 @@ namespace meta
         /// \par Complexity
         /// \f$ O(1) \f$.
         /// \ingroup trait
-        template <class T>
+        template <typename T>
         using alignof_ = meta::size_t<alignof(T)>;
 
         namespace lazy
@@ -1146,7 +1146,7 @@ namespace meta
             template <bool>
             struct _and_
             {
-                template <class...>
+                template <typename...>
                 using invoke = std::true_type;
             };
 
@@ -1166,7 +1166,7 @@ namespace meta
             template <bool>
             struct _or_
             {
-                template <class = void>
+                template <typename = void>
                 using invoke = std::false_type;
             };
 
@@ -2484,7 +2484,7 @@ namespace meta
         {
             struct for_each_fn
             {
-                template <class UnaryFunction, class... Args>
+                template <typename UnaryFunction, typename... Args>
                 constexpr auto operator()(list<Args...>, UnaryFunction f) const -> UnaryFunction
                 {
                     return (void)std::initializer_list<int>{((void)f(Args{}), 0)...}, f;
@@ -3459,7 +3459,7 @@ namespace meta
             template <typename T, typename C = std_deque<T>>
             using std_queue = std::queue<T, C>;
             template <typename T, typename C = std_vector<T>,
-                      class D = std::less<typename C::value_type>>
+                      typename D = std::less<typename C::value_type>>
             using std_priority_queue = std::priority_queue<T, C, D>;
             template <typename T, typename C = std_deque<T>>
             using std_stack = std::stack<T, C>;

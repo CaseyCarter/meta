@@ -1252,69 +1252,73 @@ namespace meta
         /// \cond
         namespace detail
         {
-#ifdef META_CONCEPT
-            template <typename...>
-            struct _and_ : std::false_type
-            {
-            };
-
-            template <>
-            struct _and_<> : std::true_type
-            {
-            };
-
-            template <Integral B, typename... Bs>
-            requires _v<B> struct _and_<B, Bs...> : _and_<Bs...>
-            {
-            };
-
-            template <typename...>
-            struct _or_ : std::true_type
-            {
-            };
-
-            template <>
-            struct _or_<> : std::false_type
-            {
-            };
-
-            template <Integral B, typename... Bs>
-            requires !_v<B> struct _or_<B, Bs...> : _or_<Bs...>
-            {
-            };
-#else
             template <bool>
+            struct _and1_
+            {
+                template <typename...>
+                using invoke = std::true_type;
+            };
+
+            template <bool>
+            struct _and2_
+            {
+                template <typename... Bs>
+                using invoke = invoke<_and1_<sizeof...(Bs) == 0>, Bs...>;
+            };
+
+            template <>
+            struct _and2_<false>
+            {
+                template <typename...>
+                using invoke = std::false_type;
+            };
+
+            template <>
+            struct _and1_<false>
+            {
+                template <Integral B, typename... Bs>
+                using invoke = invoke<_and2_<B::value>, Bs...>;
+            };
+
+            template <typename... Bs>
             struct _and_
+            {
+                using type = invoke<_and1_<sizeof...(Bs) == 0>, Bs...>;
+            };
+
+            template <bool>
+            struct _or1_
+            {
+                template <typename...>
+                using invoke = std::false_type;
+            };
+
+            template <bool>
+            struct _or2_
             {
                 template <typename...>
                 using invoke = std::true_type;
             };
 
             template <>
-            struct _and_<false>
+            struct _or2_<false>
             {
-                template <typename B, typename... Bs>
-                using invoke = invoke<
-                    if_c<!B::type::value, id<std::false_type>, _and_<0 == sizeof...(Bs)>>,
-                    Bs...>;
-            };
-
-            template <bool>
-            struct _or_
-            {
-                template <typename = void>
-                using invoke = std::false_type;
+                template <typename... Bs>
+                using invoke = invoke<_or1_<sizeof...(Bs) == 0>, Bs...>;
             };
 
             template <>
-            struct _or_<false>
+            struct _or1_<false>
             {
-                template <typename B, typename... Bs>
-                using invoke = invoke<
-                    if_c<B::type::value, id<std::true_type>, _or_<0 == sizeof...(Bs)>>,
-                    Bs...>;
+                template <Integral B, typename... Bs>
+                using invoke = invoke<_or2_<B::value>, Bs...>;
             };
-#endif
+
+            template <typename... Bs>
+            struct _or_
+            {
+                using type = invoke<_or1_<sizeof...(Bs) == 0>, Bs...>;
+            };
         } // namespace detail
         /// \endcond
 
@@ -1330,7 +1334,7 @@ namespace meta
 
 #if META_CXX_FOLD_EXPRESSIONS
         /// Logically AND together all the Boolean parameters
-/// \ingroup logical
+        /// \ingroup logical
         template <bool... Bs>
         using and_c = bool_<(true && ... && Bs)>;
 #elif defined(__GNUC__) && !defined(__clang__) && __GNUC__ == 5 && __GNUC_MINOR__ == 1
@@ -1358,12 +1362,7 @@ namespace meta
         /// parameters, \e with short-circuiting.
         /// \ingroup logical
         template <typename... Bs>
-#ifdef META_CONCEPT
         using and_ = _t<detail::_and_<Bs...>>;
-#else
-        // Make a trip through defer<> to avoid CWG1430
-        using and_ = _t<defer<detail::_and_<0 == sizeof...(Bs)>::template invoke, Bs...>>;
-#endif
 
         /// Logically OR together all the Boolean parameters
         /// \ingroup logical
@@ -1389,12 +1388,7 @@ namespace meta
         /// parameters, \e with short-circuiting.
         /// \ingroup logical
         template <typename... Bs>
-#ifdef META_CONCEPT
         using or_ = _t<detail::_or_<Bs...>>;
-#else
-        // Make a trip through defer<> to avoid CWG1430
-        using or_ = _t<defer<detail::_or_<0 == sizeof...(Bs)>::template invoke, Bs...>>;
-#endif
 
         namespace lazy
         {

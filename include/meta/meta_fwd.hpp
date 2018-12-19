@@ -18,6 +18,11 @@
 #include <type_traits>
 #include <utility>
 
+#ifdef __clang__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-variable-declarations"
+#endif
+
 #define META_CXX_STD_14 201402L
 #define META_CXX_STD_17 201703L
 
@@ -253,5 +258,9 @@ namespace meta
         }
     } // inline namespace v1
 } // namespace meta
+
+#ifdef __clang__
+#pragma GCC diagnostic pop
+#endif
 
 #endif

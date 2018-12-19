@@ -26,6 +26,7 @@
 #pragma GCC diagnostic ignored "-Wunknown-pragmas"
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wdocumentation-deprecated-sync"
+#pragma GCC diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
 /// \defgroup meta Meta
@@ -1327,9 +1328,9 @@ namespace meta
         template <Integral B>
         using not_ = not_c<B::type::value>;
 
-/// Logically and together all the Boolean parameters
-/// \ingroup logical
 #if META_CXX_FOLD_EXPRESSIONS
+        /// Logically AND together all the Boolean parameters
+/// \ingroup logical
         template <bool... Bs>
         using and_c = bool_<(true && ... && Bs)>;
 #elif defined(__GNUC__) && !defined(__clang__) && __GNUC__ == 5 && __GNUC_MINOR__ == 1
@@ -1345,7 +1346,7 @@ namespace meta
 #endif
 
         /// Logically AND together all the integral constant-wrapped Boolean
-        /// parameters, \e without doing short-circuiting.
+        /// parameters, \e without short-circuiting.
         /// \ingroup logical
         template <Integral... Bs>
         using strict_and_ = and_c<Bs::type::value...>;
@@ -1376,7 +1377,7 @@ namespace meta
 #endif
 
         /// Logically OR together all the integral constant-wrapped Boolean
-        /// parameters, \e without doing short-circuiting.
+        /// parameters, \e without short-circuiting.
         /// \ingroup logical
         template <Integral... Bs>
         using strict_or_ = or_c<Bs::type::value...>;
@@ -1446,13 +1447,13 @@ namespace meta
             };
 
 #ifdef META_CONCEPT
-            template<typename Fn>
+            template <typename Fn>
             struct compose_
             {
                 template <typename X, typename Y>
                 using F = invoke<Fn, X, Y>;
 
-                template<typename T0, typename T1, typename T2, typename T3, typename T4,
+                template <typename T0, typename T1, typename T2, typename T3, typename T4,
                          typename T5, typename T6, typename T7, typename T8, typename T9,
                          typename State>
                 using invoke =
@@ -3886,7 +3887,7 @@ namespace meta
 #endif
 /// \endcond
 
-#if defined(__clang__)
+#ifdef __clang__
 #pragma GCC diagnostic pop
 #endif
 #endif
